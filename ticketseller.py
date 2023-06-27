@@ -22,7 +22,7 @@ try:
 except Exception as e:
     print(e)
 
-TEMPLATE_JSON = {
+TEMPLATE_CONCERTO = {
     "name": "TZN 2023",
     "desc": "Concerto di Tiziano Ferro a Bologna allo Stadio dell'Ara",
     "artists": [
@@ -44,7 +44,7 @@ TEMPLATE_JSON = {
     "tickets": [
         ["standard", 30, 31900],
         ["premium", 100, 3000],
-        ["standard", 30, 100]
+        ["backstage", 300, 100]
     ],
     "location": {
         "locname" : "Stadio Dall'Ara",
@@ -63,13 +63,26 @@ TEMPLATE_JSON = {
     }
 }
 
+TEMPLATE_TICKET = {
+    "concert" : "TZN 2023",
+    "anagrafica" : {
+        "name": "Giorgio Pow3r",
+        "surname": "Calandrelli di Ostia",
+        "birth_date" : "1992-11-22T00:00:00Z"
+    },
+    "purchase_date": f"{datetime.now()}",
+    "ticket_type": "backstage"
+}
+
+
 def getLocFromAddress(locname = None, address = None, city = None):
     '''
     returns GeoJSON point coordinates of an address
     '''
     fulladdress = f"{locname}, {city}"
     location = geolocator.geocode(fulladdress)
-    if location is None:
+    #ritorna None se non trova il posto e cerca l'indirizzo normale
+    if location is None: 
         fulladdress = f"{address}, {city}"
         location = geolocator.geocode(fulladdress)
     # Create a GeoJSON Point from coords
@@ -97,12 +110,19 @@ def insertConcert():
 
     # Getting concert data from user
     concert_dict["name"], concert_dict["desc"]  = input("Name of the concert: "), input("Description of the concert?: ")    
+    '''
+    inserisci artisti fino a che non viene inserito il carratere di escape "e"
+    '''
     while True:
         concert_artist = input("Artist partecipating? ['e' to exit]: ")
         if (concert_artist == 'e'):
             break
         concert_dict["artists"].append(concert_artist)
+    #inserisce la capacità nella capacità totale, corrente e in una variabile temporanea
     concert_dict["capacity"] = concert_dict["currentcapacity"] = capacity = int(input("How many seats?: "))
+    '''
+    qui inserisci i tipi di ticket che vanno a scalare sulla capacità totale fino a che non si raggiunge il massimo
+    '''
     while True:
         print("Ticket creation, insert name, price and capacity [exit when max capacity is reached]:")
         ticket_name = input("Ticket name: ")
@@ -127,7 +147,7 @@ def insertConcert():
 
     # Insert location data in main dictionary
     concert_dict["location"] = concert_location
-
+    #inserimento dei dati del concerto su mongoDB
     collection_concerts.insert_one(concert_dict)
 
 def getConcerts():
