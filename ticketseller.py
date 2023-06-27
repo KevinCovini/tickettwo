@@ -28,7 +28,13 @@ TEMPLATE_JSON = {
     "artists": [
         "Tiziano Ferro",
         "Tiziano Acciaio",
-        "Tiziano Titanio"
+        "Tiziano Titanio",
+        "Tiziano Tungsteno",
+        "Tiziano Ferramenta",
+        "Tiziano Piombo",
+        "Tiziano Palladio",
+        "Tiziano Platino",
+        "Tiziano Tiziano"
     ],
     "dates": [
         "2023-07-11T10:30:00Z"
