@@ -12,7 +12,8 @@ geolocator = Nominatim(user_agent="my_geocoder")
 uri = "mongodb+srv://kcovini:admin@kcluster.vg9adfo.mongodb.net/?retryWrites=true&w=majority"
 client = MongoClient(uri)
 db_tickettwo = client["TicketTwo"]
-collection_concert = db_tickettwo["Concerts"]
+collection_concerts = db_tickettwo["Concerts"]
+collection_sales = db_tickettwo["Sales"]
 
 # Connection check
 try:
@@ -20,7 +21,6 @@ try:
     print("Connection successful!")
 except Exception as e:
     print(e)
-
 
 TEMPLATE_JSON = {
     "name": "TZN 2023",
@@ -68,10 +68,11 @@ def getLocFromAddress(locname = None, address = None, city = None):
         location = geolocator.geocode(fulladdress)
     # Create a GeoJSON Point from coords
     try:
-        point = geojson.Point((location.longitude, location.latitude))  # Longitude, Latitude
+        point = geojson.Point((location.longitude, location.latitude))
         # Convert the GeoJSON object to a dictionary
         point_dict = geojson.Feature(geometry=point, properties={}).__geo_interface__
     except:
+        # If no address is found we return an empty dictionary
         return {}
     return point_dict
 
@@ -87,6 +88,7 @@ def insertConcert():
     concert_location = {
         "coords" : {}
     }
+
     # Getting concert data from user
     concert_dict["name"], concert_dict["desc"]  = input("Name of the concert: "), input("Description of the concert?: ")    
     while True:
@@ -120,7 +122,7 @@ def insertConcert():
     # Insert location data in main dictionary
     concert_dict["location"] = concert_location
 
-    collection_concert.insert_one(concert_dict)
+    collection_concerts.insert_one(concert_dict)
 
 def getConcerts():
     return 0
