@@ -159,3 +159,54 @@ def orderTicket():
 
 if __name__ == "__main__":
     insertConcert()
+
+
+
+def insertTicket():
+    ticket_dict = {}
+    # Insert ticket data
+
+    concert = input("Concert Name: ")
+
+    while True:
+        if collection_concerts.find({"name":concert}).count() > 0:
+            ticket_dict["concert"] = concert
+            selected_concert = collection_concerts.find({"name":concert})
+            break
+        else:
+            print("The inserted concert does not exist.")
+
+    # Insert user's personal data
+    ticket_dict["name"] = input("Name: ")
+    ticket_dict["surname"] = input("Surname: ")
+    ticket_dict["birth_date"] = input("Birth Date: ")
+    
+    type = input("Ticket Type (type ? for details): ")
+
+    # Valid type check
+    result = None
+    choices = [choice[:1][0] for choice in selected_concert[0]["tickets"]]
+    while result == None:
+        type.lower()
+        if type not in choices:
+            print("Error: you must choose a valid option.")
+        elif type == "?":
+            print(f"You can choose one of the following types: {choices}.")
+        else:
+            result = type
+    
+    ticket_dict["ticket_type"] = result
+
+    # Decrement of currentcapacity and ticket type
+    filter_query = {"name":concert}
+    update_query = {"$inc": {"currentcapacity": -1}}
+    update_query2 = {"$inc": {"tickets.0.2": -1}}
+
+    collection_concerts.update_one(filter_query,update_query)
+    collection_concerts.update_one(filter_query,update_query2)
+
+    # Set purchase date at the end of the purchase
+    ticket_dict["purchase_date"] = datetime.now
+
+    return collection_sales.insert_one(ticket_dict)
+        
