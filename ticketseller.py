@@ -37,7 +37,7 @@ TEMPLATE_CONCERTO = {
         "Tiziano Tiziano"
     ],
     "dates": [
-        "2023-07-11T10:30:00Z"
+        datetime(2023, 7, 11, 10, 30, 00) # 11/07/2023 alle 10:30:00
     ],
     "capacity": 35000,
     "currentcapacity": 35000,
@@ -68,7 +68,7 @@ TEMPLATE_TICKET = {
     "anagrafica" : {
         "name": "Giorgio Pow3r",
         "surname": "Calandrelli di Ostia",
-        "birth_date" : "1992-11-22T00:00:00Z"
+        "birth_date" : datetime(1992, 11, 22)
     },
     "purchase_date": f"{datetime.now()}",
     "ticket_type": "backstage"
@@ -97,7 +97,8 @@ def getLocFromAddress(locname = None, address = None, city = None):
 
 def insertConcert():
     '''
-    Inserts concert data in the connected MongoDB database.
+    Inserts concert data in the connected MongoDB database and returns the _id of the inserted file.
+    [this whole function is a dictionary population]
     '''
     # Allocating lists for .append()
     concert_dict = {
@@ -109,7 +110,7 @@ def insertConcert():
     }
 
     # Getting concert data from user
-    concert_dict["name"], concert_dict["desc"]  = input("Name of the concert: "), input("Description of the concert?: ")    
+    concert_dict["name"], concert_dict["desc"]  = input("Name of the concert: "), input("Description of the concert: ")    
     '''
     inserisci artisti fino a che non viene inserito il carratere di escape "e"
     '''
@@ -120,15 +121,14 @@ def insertConcert():
         concert_dict["artists"].append(concert_artist)
     #inserisce la capacità nella capacità totale, corrente e in una variabile temporanea
     concert_dict["capacity"] = concert_dict["currentcapacity"] = capacity = int(input("How many seats?: "))
-    '''
-    qui inserisci i tipi di ticket che vanno a scalare sulla capacità totale fino a che non si raggiunge il massimo
-    '''
+
+    # qui inserisci i tipi di ticket che vanno a scalare sulla capacità totale fino a che non si raggiunge il massimo
     while True:
         print("Ticket creation, insert name, price and capacity [exit when max capacity is reached]:")
         ticket_name = input("Ticket name: ")
         ticket_price = input("Ticket price: ")
         ticket_capacity = int(input("Ticket capacity: "))
-        if capacity >= 0:
+        if capacity <= 0:
             print("Maximum capacity reached! Proceeding with concert creation.")
             break
         else: 
@@ -148,7 +148,7 @@ def insertConcert():
     # Insert location data in main dictionary
     concert_dict["location"] = concert_location
     #inserimento dei dati del concerto su mongoDB
-    collection_concerts.insert_one(concert_dict)
+    return collection_concerts.insert_one(concert_dict)
 
 def getConcerts():
     return 0
