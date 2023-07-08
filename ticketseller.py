@@ -1,3 +1,54 @@
+'''
+ESPOSIZIONE FUNZIONALITA' PROGRAMMA (per video)
+(Ci saranno dati già presenti sia di concerti che di ticket, grazie Max)
+- Inserimento di un concerto
+- Ricerca di un concerto: 
+    per nome
+    per artista partecipante
+- Acquisto di un biglietto
+- Rimborso di un biglietto:
+    Rimborso valido
+    Rimborso invalido
+
+FUNZIONI DA FARE
+
+-- getConcert() --
+
+- PARTE OBBLIGATORIA:
+    ricerca per:
+      artista partecipante
+      nome concerto
+- PARTE FACOLTATIVA:
+    ricertca per:
+      intervallo di date
+      per distanza
+- COME FARE:
+    fare la find sulla collection dei concerti e filtrare per quello che da in input l'utente
+    visualizzare i seguenti dati: nome concerto, capienza attuale e i dati completi dei ticket
+
+    
+-- refundTicket() --
+
+- COME FARE:
+    - input anagrafica dell'utente (vedi "anagrafica" in ticket)
+    - ricerca tutti i ticket registrati a quell'anagrafica
+    - selezione ticket da rimborsare
+    - verifica se il concerto c'è già stato o no
+        se il concerto è da fare rimborso
+        se il concerto è già fatto no rimborso
+    - implementare pipeline per automatizzare l'increase della capacità del concerto se viene rimborsato un ticket
+
+FUNZIONI DA MODIFICARE/MIGLIORARE
+
+-- buyTicket() --
+
+- Aggiungere possibilità di comprare più biglietti
+- implementare pipeline per automatizzare il decrease della capacità del concerto se viene acquisato un ticket
+
+    
+'''
+
+
 import pymongo as pm
 from pymongo import MongoClient
 import geojson
@@ -153,16 +204,7 @@ def insertConcert():
 def getConcerts():
     return 0
 
-def orderTicket():
-    return 0
-
-
-if __name__ == "__main__":
-    insertConcert()
-
-
-
-def insertTicket():
+def buyTicket():
     ticket_dict = {}
     # Insert ticket data
 
