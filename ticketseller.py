@@ -201,7 +201,7 @@ def insertConcert():
     #inserimento dei dati del concerto su mongoDB
     return collection_concerts.insert_one(concert_dict)
 
-def getConcerts():
+def searchConcert(concerto, artisti = []):
     return 0
 
 def buyTicket():
@@ -251,4 +251,33 @@ def buyTicket():
     ticket_dict["purchase_date"] = datetime.now
 
     return collection_sales.insert_one(ticket_dict)
+
+def refundTicket():
+    return 0
         
+
+
+if __file__ == "__main__":
+    BENVENUTO = '''Benvenuto su TicketTwo!
+    1. Annuncia un concerto
+    2. Cerca un concerto
+    3. Compra un biglietto
+    4. Rimborsa un biglietto
+    '''
+    print(BENVENUTO)
+    selezione = int(input("Seleziona un'opzione: "))
+    if selezione == 1:
+        insertConcert()
+    elif selezione == 2:
+        lista_artisti = []
+        concerto = input("Inserisci il nome del concerto [Enter per andare avanti]: ")
+        while True:
+            artista = input("Artisti partecipanti [inserire 'e' per andare avanti]: ")
+            if (artista == 'e'):
+                break
+            lista_artisti.append(artista)
+        searchConcert(concerto=concerto, artisti=lista_artisti)
+    elif selezione == 3:
+        buyTicket()
+    elif selezione == 4:
+        refundTicket()
