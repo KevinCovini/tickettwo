@@ -1,54 +1,3 @@
-'''
-ESPOSIZIONE FUNZIONALITA' PROGRAMMA (per video)
-(Ci saranno dati già presenti sia di concerti che di ticket, grazie Max)
-- Inserimento di un concerto
-- Ricerca di un concerto: 
-    per nome
-    per artista partecipante
-- Acquisto di un biglietto
-- Rimborso di un biglietto:
-    Rimborso valido
-    Rimborso invalido
-
-FUNZIONI DA FARE
-
--- getConcert() --
-
-- PARTE OBBLIGATORIA:
-    ricerca per:
-      artista partecipante
-      nome concerto
-- PARTE FACOLTATIVA:
-    ricertca per:
-      intervallo di date
-      per distanza
-- COME FARE:
-    fare la find sulla collection dei concerti e filtrare per quello che da in input l'utente
-    visualizzare i seguenti dati: nome concerto, capienza attuale e i dati completi dei ticket
-
-    
--- refundTicket() --
-
-- COME FARE:
-    - input anagrafica dell'utente (vedi "anagrafica" in ticket)
-    - ricerca tutti i ticket registrati a quell'anagrafica
-    - selezione ticket da rimborsare
-    - verifica se il concerto c'è già stato o no
-        se il concerto è da fare rimborso
-        se il concerto è già fatto no rimborso
-    - implementare pipeline per automatizzare l'increase della capacità del concerto se viene rimborsato un ticket
-
-FUNZIONI DA MODIFICARE/MIGLIORARE
-
--- buyTicket() --
-
-- Aggiungere possibilità di comprare più biglietti
-- implementare pipeline per automatizzare il decrease della capacità del concerto se viene acquisato un ticket
-
-    
-'''
-
-
 import pymongo as pm
 from pymongo import MongoClient
 import geojson
@@ -130,19 +79,25 @@ def insertConcert():
 
     # Qui inserisci i tipi di ticket che vanno a scalare sulla capacità totale fino a che non si raggiunge il massimo
     while True:
+        print("----------------------------------------------------------------")
         print(f"Current capacity: {capacity}")
         print("Ticket creation, insert name, price and capacity [exit when max capacity is reached]:")
+        print("----------------------------------------------------------------")
         ticket_name = input("Ticket name: ")
         ticket_price = input("Ticket price: ")
         ticket_capacity = int(input("Ticket capacity: "))
         capacity -= ticket_capacity
         if capacity < 0:
             capacity += ticket_capacity
+            print("--------------------------------------------------------")
             print(f"Quantità non valida | posti rimanenti {capacity}")
+            print("--------------------------------------------------------")
             continue
         else:
             if capacity == 0:
+                print("--------------------------------------------------------")
                 print("Maximum capacity reached! Proceeding with concert creation.")
+                print("--------------------------------------------------------")
                 concert_tickets.append([ticket_name, ticket_price, ticket_capacity])
                 break
             else:
@@ -217,6 +172,7 @@ def searchConcert(concerto=None, artisti=None):
         results = collection_concerts.find()
 
     for doc in results:
+        print("----------------------------------------------------------------")
         print(str(doc["name"]))
         print(str(doc["currentcapacity"]) + "/" + str(doc["capacity"]))
         tickets = doc.get("tickets")
@@ -228,7 +184,7 @@ def searchConcert(concerto=None, artisti=None):
                 print("Ticket rimanenti:", ticket[2])
         else:
             print("Nessun dato sui biglietti disponibile per questo concerto.")
-
+        print("----------------------------------------------------------------")
     return 0
 
 
@@ -246,8 +202,7 @@ def buyTicket():
             break
         else:
             print("The inserted concert does not exist.")
-    '''for concert in selected_concert:
-        print(concert)'''
+
     # Insert dei dati personali dell'utente
     ticket_dict["name"] = input("Name: ")
     ticket_dict["surname"] = input("Surname: ")
@@ -272,29 +227,7 @@ def buyTicket():
 
     ticket_dict["ticket_type"] = result
 
-#----------------------------------------------------------------
-    '''
-    Per Tommy                                                          IMPORTANTE!!!!!!!!!!
-    qui praticamente è come se non trovasse l'indice corrispondente della tipologia di ticket
-    che vogliamo andare a decrementare
-    concentrati su questa parte tra le -------------- 
-    fai chiaramente qualche prova
-    P.S. ho eliminato tutto dal database almeno si possono fare i test bene quindi aggiungi prima un concerto e poi
-    compra un ticket 
-    poi vedi sa va e fai magari una prova con il rimborso (anche se va)
-
-    ඞඞඞඞඞඞඞඞඞඞඞඞඞඞඞඞඞඞඞඞඞඞඞඞඞඞඞඞඞඞඞඞඞඞඞඞඞඞඞ
-
-    Per Max e Kevin
-    il problema era dato dal for che stampava gli elementi di selected_concert, non ho idea del motivo, ma commentandolo
-    funziona alla perfezione.
-    '''
-#    # Decrementa la capacità attuale e della tipologia di ticket
-#     filter_query = {"name": concert, "tickets": {"$elemMatch": {"$eq": [result]}}}
-#     update_query = {"$inc": {"currentcapacity": -1, "tickets.$.2": -1}}
-#     collection_concerts.update_one(filter_query, update_query)
-
-    # Decremento "funzionante"
+    # Decremento della capacità
     filter_query = {"name": concert}
     update_query = {"$inc": {"currentcapacity": -1}}
     update_query2 = {"$inc": {f"tickets.{choices.index(result)}.2": -1}}
@@ -307,14 +240,6 @@ def buyTicket():
     print(risultatodellaquery[0]["currentcapacity"])
     print(risultatodellaquery[0]["tickets"][0][2])
 
-    # PARTE VECCHIA
-    # filter_query = {"name": concert}
-    # update_query = {"$inc": {"currentcapacity": -1}}
-    # update_query2 = {"$inc": {f"tickets.{choices.index(result)}.2": -1}}
-    
-    # collection_concerts.update_one(filter_query, update_query)
-    # collection_concerts.update_one(filter_query, update_query2)
-#------------------------------------------------------------------------------
     # Set della data di acquisto
     current_date = datetime.now()
     ticket_dict["purchase_date"] = current_date
@@ -340,7 +265,9 @@ def refundTicket():
 
         while True: #scelta del ticket sul quale effettuare il refound
             try:
+                print("----------------------------------------------------------------")
                 print("Premi q per uscire.")
+                print("----------------------------------------------------------------")
                 choice = input("Scelta: \n")
                 if choice == "q":
                     break
@@ -358,29 +285,30 @@ def refundTicket():
                     current_date = datetime.now()
                     if concert_search is not None:
                         if current_date >= concert_date: # Controllo se il concerto si è già svolto
+                            print("----------------------------------------------------------------")
                             print("Il rimborso non può essere effuttuato perchè ormai il concerto si è già svolto")
+                            print("----------------------------------------------------------------")
                         else:
                             collection_sales.delete_one(selected_ticket)
+                            print("----------------------------------------------------------------")
                             print("Ticket eliminato con successo.")
+                            print("----------------------------------------------------------------")
                             #andiamo a incrementare il numero di ticket
                             filter_query = {"name": selected_concert}
                             update_query = {"$inc": {"currentcapacity": 1}}
-                            #update_query2 = {"$inc": {f"tickets.{selected_type.index(selected_ticket['ticket_type'])}.2": 1}}
-                            '''
-                            La query commentata è sbagliata in quanto selected_type è una stringa e non una lista, quindi non possiede
-                            il metodo index.
-                            Inoltre anche l'argomento di index non era corretto dato che selected_type = selected_ticket["ticket_type"]
-                            e quindi in pratica con selected_type si stava cercando l'indice di sé stesso.
-                            '''
                             update_query2 = {"$inc": {f"tickets.{choices.index(selected_type)}.2": 1}}
 
                             collection_concerts.update_one(filter_query, update_query)
                             collection_concerts.update_one(filter_query, update_query2)
                             break
             except ValueError:
+                print("----------------------------------------------------------------")
                 print("Valore inserito non valido")
+                print("----------------------------------------------------------------")
     else:
+        print("----------------------------------------------------------------")
         print("Nessun risultato trovato.")
+        print("----------------------------------------------------------------")
 
     return 0
 
